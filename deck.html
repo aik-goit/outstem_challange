@@ -1,0 +1,104 @@
+<html>
+    <style>
+        .center1 {
+        border: 5px solid;
+        margin: auto;
+        width: 50%;
+        padding: 10px;
+        text-align: center;
+        }
+        .center2 {
+        text-align: center;
+        margin: auto;
+        width: 50%;
+        padding: 10px;
+        }
+        .button {
+          background-color: #f44336; 
+          border: none;
+          color: white;
+          padding: 15px 32px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          margin: 4px 2px;
+          cursor: pointer;
+        }
+        .button2 {background-color: #555555;} 
+   h2 {
+           font-family: Arial;
+       color: #444;
+       margin: 0;
+       padding: 0px 0px 6px 0px;
+       font-size: 51px;
+       line-height: 44px;
+       letter-spacing: -2px;
+       font-weight: bold;
+   }
+    </style>
+<body onload ="first()">
+   <h2 class="center1">Deck of Cards Game</h2>
+   <br>
+   <div hidden id = "output1"> </div> 
+   <script>
+       function first(){
+            fetch('https://www.deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
+           .then(res=> {return res.json();}).then(data=>{console.log(data); document.getElementById('output1').innerHTML = data.deck_id;})
+        }
+   </script>
+
+   <div class="center2" style="font-family: Arial">In this game, you must guess whether the card drawn will be red or black.  </div>
+   <br>
+   <div class ="center1" style="font-family: Arial" id = "output2">
+    <button class="button button" onclick = "fetchData(this.id)" id="red"> Click for Red </button>
+    <button class="button button2" onclick = "fetchData(this.id)" id="black"> Click for Black</button>
+    <br><br>
+   </div> 
+   <div hidden id = "value"> </div> 
+   <br>
+   <div class="center2">
+   <button hidden id ="retry" onclick="window.location.reload();">Click to try again!</button>
+   <button hidden id ="continue" >Click to proceed to the next level!</button>
+   </div>
+   <script>
+      function displayImage(src, width, height) {
+      var img = document.createElement("img");
+      img.src = src;
+      img.width = width;
+      img.height = height;
+      document.getElementById("output2").appendChild(img);
+    }
+    
+   </script>
+   <script>
+      let  output2= document.getElementById('output2');
+      
+      function fetchData(clicked_id) {
+            clicked_id.disabled = true
+            fetch('https://www.deckofcardsapi.com/api/deck/'+document.getElementById('output1').innerHTML+'/draw/?count=1')
+            .then(response => response.json())
+            .then(data => {document.getElementById('value').innerHTML = data.cards[0].value;
+
+            if(clicked_id == "red" &&  (data.cards[0].suit== "HEARTS" || data.cards[0].suit== "DIAMONDS")){
+                output2.innerHTML += "Congratulations, you guessed correctly! The selected card was:</br>";
+                output2.innerHTML == displayImage(data.cards[0].image, 200, 280);
+                document.querySelector('#continue').hidden =false;   
+            }
+            else if (clicked_id == "black" &&  (data.cards[0].suit== "CLUBS" || data.cards[0].suit== "SPADES")){
+                output2.innerHTML += "Congratulations, you guessed correctly! The selected card was:</br>";
+                output2.innerHTML == displayImage(data.cards[0].image, 200, 280);
+                document.querySelector('#continue').hidden =false;   
+            }
+            else{
+                output2.innerHTML += "Sorry, you guessed incorrectly! The selected card was:</br>";
+                output2.innerHTML == displayImage(data.cards[0].image, 200, 280);
+                document.querySelector('#retry').hidden =false;    
+            }
+            })
+            document.querySelector('#red').disabled = true;
+            document.querySelector('#black').disabled = true;
+         }
+   </script>
+</body>
+</html>
